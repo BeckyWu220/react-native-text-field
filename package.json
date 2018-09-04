@@ -1,10 +1,10 @@
 {
   "dependencies": {
-    "eslint": "^4.12.1",
-    "tns-core-modules": "^4.0.0",
-    "tns-ios": "^4.0.1",
     "react-native-masked-text": "^1.7.2",
     "prop-types": "^15.6.0"
+  },
+  "peerDependencies": {
+    "react-native": "0.53.0"
   },
   "name": "react-native-text-field",
   "version": "1.0.0",
