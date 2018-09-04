@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "eslint": "^4.12.1",
+    "tns-core-modules": "^4.0.0",
+    "tns-ios": "^4.0.1"
+  },
+  "name": "react-native-text-field",
+  "version": "1.0.0",
+  "description": "A text-field component that wraps text input with customizable title and placeholder. ",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BeckyWu220/react-native-text-field.git"
+  },
+  "keywords": [
+    "textfield",
+    "textinput",
+    "input",
+    "text",
+    "field"
+  ],
+  "author": "Becky Wu <wwq220@gmail.com> (http://www.beckywu.me)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BeckyWu220/react-native-text-field/issues"
+  },
+  "homepage": "https://github.com/BeckyWu220/react-native-text-field#readme"
+}
