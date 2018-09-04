@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Platform } from 'react-native';
+import { View, Text, TextInput, Platform, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './styles';
 import { TextInputMask } from 'react-native-masked-text';
 
 const CELL_HEIGHT = 40;
+const deviceWidth = Dimensions.get('window').width;
 
 export default class TextField extends Component {
 	static propTypes = {
@@ -12,6 +13,7 @@ export default class TextField extends Component {
 		value       	: PropTypes.any,
 		placeholder 	: PropTypes.string,
 		cellHeight		: PropTypes.number,
+		width			: PropTypes.number,
 		onInputChange 	: PropTypes.func,
 		textType 		: PropTypes.string,
 		marginLeft		: PropTypes.number,
@@ -79,7 +81,7 @@ export default class TextField extends Component {
 	renderMaskedTextInput = () => {
 		const { placeholder, cellHeight, marginLeft, marginRight } = this.props;
 		return (
-			<View>
+			<View style={{width: this.props.width || deviceWidth}}>
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
@@ -92,7 +94,7 @@ export default class TextField extends Component {
 					style={[styles.textField, this.props.textFieldStyle, { height: cellHeight, marginLeft, marginRight }]}
 					value={this.state.text}
 					placeholder={Platform.OS === 'ios' ? placeholder : ''}
-					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
+					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
 					keyboardType={'numeric'}
 					editable={true}
@@ -113,7 +115,7 @@ export default class TextField extends Component {
 	renderTextInput = () => {
 		const { placeholder, cellHeight } = this.props;
 		return (
-			<View>
+			<View style={{width: this.props.width || deviceWidth}}>
 				<TextInput
 					allowFontScaling={false}
 					style={this.stylishTextInput()}
