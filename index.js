@@ -92,7 +92,7 @@ export default class TextField extends Component {
 					style={[styles.textField, this.props.textFieldStyle, { height: cellHeight, marginLeft, marginRight }]}
 					value={this.state.text}
 					placeholder={Platform.OS === 'ios' ? placeholder : ''}
-					placeholderTextColor={this.props.placeholderStyle.color}
+					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
 					keyboardType={'numeric'}
 					editable={true}
@@ -119,7 +119,7 @@ export default class TextField extends Component {
 					style={this.stylishTextInput()}
 					value={this.state.text}
 					placeholder={Platform.OS === 'ios' ? placeholder : ''}
-					placeholderTextColor={this.props.placeholderStyle.color}
+					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
 					editable={true}
 					multiline={cellHeight > CELL_HEIGHT}
