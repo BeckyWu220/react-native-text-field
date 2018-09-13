@@ -13,7 +13,9 @@ export default class TextField extends Component {
 		value       	: PropTypes.any,
 		placeholder 	: PropTypes.string,
 		cellHeight		: PropTypes.number,
+		isMultiline		: PropTypes.bool,
 		width			: PropTypes.number,
+		style			: PropTypes.style,
 		onInputChange 	: PropTypes.func,
 		textType 		: PropTypes.string,
 		marginLeft		: PropTypes.number,
@@ -22,6 +24,13 @@ export default class TextField extends Component {
 		textFieldStyle	: PropTypes.object,
 		placeholderStyle: PropTypes.object,
 		selectionColor	: PropTypes.string,
+		isRequired		: PropTypes.bool,
+		isSecured		: PropTypes.bool,
+		onValidate		: PropTypes.func,
+		invalidTextFieldStyle : PropTypes.object,
+		invalidHint		: PropTypes.string,
+		invalidHintStyle: PropTypes.object,
+		hintHeight 		: PropTypes.number
 	};
 
 	static defaultProps = {
@@ -29,18 +38,27 @@ export default class TextField extends Component {
 		value       : null,
 		placeholder : '',
 		cellHeight	: CELL_HEIGHT,
+		isMultiline	: false,
 		textType 	: 'default',
         marginLeft	: 15,
-        marginRight	: 15
+		marginRight	: 15,
+		isRequired	: false,
+		isSecured	: false,
+		onValidate	: null,
+		invalidHint : 'Your input is not valid.',
+		hintHeight	: 20
 	};
 
 	state = {
-        text: null
+		text: null,
+		isValid: true,
+		invalidMessage: '',
 	}
 
 	componentDidMount() {
 		this.setState({
-			text: this.props.value
+			text: this.props.value,
+			invalidMessage: this.props.invalidHint
 		});
 	}
 
@@ -48,6 +66,11 @@ export default class TextField extends Component {
 		if (nextProps.value !== this.props.value) {
 			this.setState({
 				text: nextProps.value
+			});
+		}
+		if (nextProps.invalidHint !== this.props.invalidHint) {
+			this.setState({
+				invalidMessage: nextProps.invalidHint
 			});
 		}
 	}
@@ -72,7 +95,7 @@ export default class TextField extends Component {
 		if (title.length > 0) {
 			return (
 				<Text style={[styles.title, this.props.titleStyle]}>
-					{title}
+					{`${title}${this.props.isRequired ? '*' : ''}`}
 				</Text>
 			);
 		}
@@ -109,7 +132,10 @@ export default class TextField extends Component {
 
 	stylishTextInput = () => {
 		const { cellHeight } = this.props;
-		return [styles.textField, this.props.textFieldStyle, { height: cellHeight }];
+		if (this.state.isValid) {
+			return [styles.textField, this.props.textFieldStyle, { height: cellHeight }];
+		}
+		return [styles.invalidTextField, this.props.invalidTextFieldStyle, { height: cellHeight }];
 	}
 
 	renderTextInput = () => {
@@ -124,10 +150,12 @@ export default class TextField extends Component {
 					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
 					editable={true}
-					multiline={cellHeight > CELL_HEIGHT}
+					multiline={this.props.isMultiline}
 					onChangeText={this.onTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
+					secureTextEntry={this.props.isSecured}
+					onEndEditing={(event) => this.validate(event.nativeEvent.text)}
 				/>
 				{ Platform.OS !== 'ios' && this.renderPlaceholder() }
 			</View>
@@ -145,14 +173,45 @@ export default class TextField extends Component {
 		return null;
 	}
 
+	renderInvalidHint = () => {
+		return (
+			<View style={{ height: this.props.hintHeight }}>
+				{ 
+					!this.state.isValid &&
+					<Text
+						numberOfLines={1}
+						ellipsizeMode="tail"
+						style={[styles.invalidHint, this.props.invalidHintStyle]}
+					>{ this.state.invalidMessage }</Text> 
+				}
+			</View>
+		)
+	}
+
 	render() {
 		const { title, textType } = this.props;
 		return (
-			<View>
+			<View style={this.props.style}>
 				{this.renderTitle(title)}
 				{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+				{ this.props.onValidate && this.renderInvalidHint()}
 			</View>
 		);
+	}
+
+	validate(text) {
+		if (this.props.onValidate) {
+			this.setState({
+				isValid: this.props.onValidate(text)
+			})
+		}
+	}
+
+	setAsInvalid(errorMessage = '') {
+		this.setState({
+			isValid: false,
+			invalidMessage: errorMessage
+		})
 	}
 }
 
