@@ -22,10 +22,10 @@ export default styles = StyleSheet.create({
     },
     placeholderContainer : {
         position    :  'absolute',
-        top         : 20,
+        top         : 10,
         left        : 25,
         right       : 25,
-        bottom      : 20,
+        bottom      : 10,
     },
     placeholderText : {
         color       : '#e5e5e5',
