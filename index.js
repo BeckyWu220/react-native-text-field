@@ -87,6 +87,7 @@ export default class TextField extends Component {
 		this.setState({
 			text
 		}, () => {
+			this.validate(text);
 			this.props.onInputChange(text);
 		});	
 	}
