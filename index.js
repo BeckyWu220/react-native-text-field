@@ -175,7 +175,7 @@ export default class TextField extends Component {
 
 	renderInvalidHint = () => {
 		return (
-			<View style={{ height: this.props.hintHeight }}>
+			<View style={{ height: this.props.hintHeight, width: this.props.width || deviceWidth }}>
 				{ 
 					!this.state.isValid &&
 					<Text
