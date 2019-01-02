@@ -17,6 +17,8 @@ export default class TextField extends Component {
 		width			: PropTypes.number,
 		style			: PropTypes.style,
 		onInputChange 	: PropTypes.func,
+		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
+		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
 		marginLeft		: PropTypes.number,
 		marginRight		: PropTypes.number,
@@ -39,6 +41,8 @@ export default class TextField extends Component {
 		placeholder : '',
 		cellHeight	: CELL_HEIGHT,
 		isMultiline	: false,
+		autoCapitalize: 'none',
+		autoCorrect	: false,
 		textType 	: 'default',
         marginLeft	: 15,
 		marginRight	: 15,
@@ -145,6 +149,8 @@ export default class TextField extends Component {
 			<View style={{width: this.props.width || deviceWidth}}>
 				<TextInput
 					allowFontScaling={false}
+					autoCapitalize={this.props.autoCapitalize}
+					autoCorrect={this.props.autoCorrect}
 					style={this.stylishTextInput()}
 					value={this.state.text}
 					placeholder={Platform.OS === 'ios' ? placeholder : ''}
