@@ -201,7 +201,7 @@ export default class TextField extends Component {
 			<View style={this.props.style}>
 				{this.renderTitle(title)}
 				{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
-				{ this.props.onValidate && this.renderInvalidHint()}
+				{ !this.state.isValid && this.renderInvalidHint()}
 			</View>
 		);
 	}
