@@ -214,11 +214,22 @@ export default class TextField extends Component {
 		}
 	}
 
+	setAsValid() {
+		this.setState({
+			isValid: true,
+			invalidMessage: ''
+		})
+	}
+
 	setAsInvalid(errorMessage = '') {
 		this.setState({
 			isValid: false,
 			invalidMessage: errorMessage
 		})
 	}
+
+	getIsValid() {
+        return this.state.isValid
+    }
 }
 
