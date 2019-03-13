@@ -208,9 +208,18 @@ export default class TextField extends Component {
 
 	validate(text) {
 		if (this.props.onValidate) {
-			this.setState({
-				isValid: this.props.onValidate(text)
-			})
+			if (this.props.onValidate(text) === true) {
+				this.setState({
+					isValid: true
+				})
+			} else {
+				this.setState({
+					isValid: false
+				})
+			}
+			// this.setState({
+			// 	isValid: this.props.onValidate(text)
+			// })
 		}
 	}
 
