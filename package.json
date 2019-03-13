@@ -7,7 +7,7 @@
     "react-native": "0.52.0"
   },
   "name": "react-native-text-field",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "A text-field component that wraps text input with customizable title and placeholder. ",
   "main": "index.js",
   "devDependencies": {},
