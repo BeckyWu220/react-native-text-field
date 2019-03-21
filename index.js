@@ -172,7 +172,7 @@ export default class TextField extends Component {
 	renderPlaceholder = () => {
 		if (this.state.text === null || this.state.text === '') {
 			return (
-				<View pointerEvents='none' style={styles.placeholderContainer}>
+				<View pointerEvents='none' style={{...styles.placeholderContainer, justifyContent: !this.props.isMultiline ? 'center' : 'flex-start'}}>
 					<Text style={[styles.placeholderText, this.props.placeholderStyle]}>{this.props.placeholder}</Text>
 				</View>
 			);
