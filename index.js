@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Platform, Dimensions } from 'react-native';
+import { View, Text, TextInput, Platform, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
 import PropTypes from 'prop-types';
 import styles from './styles';
-import { TextInputMask } from 'react-native-masked-text';
 
 const CELL_HEIGHT = 40;
 const deviceWidth = Dimensions.get('window').width;
@@ -20,8 +20,6 @@ export default class TextField extends Component {
 		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
 		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
-		marginLeft		: PropTypes.number,
-		marginRight		: PropTypes.number,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
 		placeholderStyle: PropTypes.object,
@@ -44,25 +42,35 @@ export default class TextField extends Component {
 		autoCapitalize: 'none',
 		autoCorrect	: false,
 		textType 	: 'default',
-        marginLeft	: 15,
-		marginRight	: 15,
 		isRequired	: false,
 		isSecured	: false,
 		onValidate	: null,
 		invalidHint : 'Your input is not valid.',
-		hintHeight	: 20
+		hintHeight	: 20,
+		textFieldStyle : {
+			borderWidth: 1, 
+			borderRadius: 4, 
+			borderColor: '#000000'
+		},
+		invalidTextFieldStyle : {
+			borderWidth: 1, 
+			borderRadius: 4, 
+			borderColor: '#ff0000'
+		}
 	};
 
 	state = {
 		text: null,
 		isValid: true,
 		invalidMessage: '',
+		isVisible: true
 	}
 
 	componentDidMount() {
 		this.setState({
 			text: this.props.value,
-			invalidMessage: this.props.invalidHint
+			invalidMessage: this.props.invalidHint,
+			isVisible: this.props.isSecured
 		});
 	}
 
@@ -107,9 +115,9 @@ export default class TextField extends Component {
 	}
 
 	renderMaskedTextInput = () => {
-		const { placeholder, cellHeight, marginLeft, marginRight } = this.props;
+		const { placeholder } = this.props;
 		return (
-			<View style={{width: this.props.width || deviceWidth}}>
+			<View style={{ flex: 1, backgroundColor: 'green'}}>
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
@@ -119,7 +127,7 @@ export default class TextField extends Component {
 						separator: '.',
 						delimiter: ',',
 					}}
-					style={[styles.textField, this.props.textFieldStyle, { height: cellHeight, marginLeft, marginRight }]}
+					style={this.stylishTextInput()}
 					value={this.state.text}
 					placeholder={Platform.OS === 'ios' ? placeholder : ''}
 					placeholderTextColor={this.props.placeholderStyle.color}
@@ -138,15 +146,15 @@ export default class TextField extends Component {
 	stylishTextInput = () => {
 		const { cellHeight } = this.props;
 		if (this.state.isValid) {
-			return [styles.textField, this.props.textFieldStyle, { height: cellHeight }];
+			return [styles.textField, { height: cellHeight }];
 		}
-		return [styles.invalidTextField, this.props.invalidTextFieldStyle, { height: cellHeight }];
+		return [styles.textField, { height: cellHeight }];
 	}
 
 	renderTextInput = () => {
-		const { placeholder, cellHeight } = this.props;
+		const { placeholder} = this.props;
 		return (
-			<View style={{width: this.props.width || deviceWidth}}>
+			<View style={{ flex: 1 }}>
 				<TextInput
 					allowFontScaling={false}
 					autoCapitalize={this.props.autoCapitalize}
@@ -161,7 +169,7 @@ export default class TextField extends Component {
 					onChangeText={this.onTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
-					secureTextEntry={this.props.isSecured}
+					secureTextEntry={!this.state.isVisible}
 					onEndEditing={(event) => this.validate(event.nativeEvent.text)}
 				/>
 				{ Platform.OS !== 'ios' && this.renderPlaceholder() }
@@ -195,12 +203,39 @@ export default class TextField extends Component {
 		)
 	}
 
+	renderVisibilityIcon = () => {
+		var visibleIconWidth = Math.min(this.props.cellHeight, CELL_HEIGHT)
+		return (
+			<TouchableOpacity style={{ width: visibleIconWidth, height: visibleIconWidth, alignItems: 'flex-end', alignItems: 'center', justifyContent: 'center'}} onPress={() => { 
+				this.setState({ 
+					isVisible: !this.state.isVisible
+				}) }}>
+				{ 	this.state.isVisible ? 
+					<Image source={require('./images/invisible.png')} resizeMode="contain" style={{ flex: 1, tintColor: 'grey' }} width={24} height={24}/> :
+					<Image source={require('./images/visible.png')} resizeMode="contain" style={{ flex: 1, tintColor: 'grey' }} width={24} height={24}/> 
+				}
+			</TouchableOpacity>
+		)
+	}
+
+	renderTextField = () => {
+		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
+		return (
+			<View style={{ width: this.props.width || deviceWidth }}>
+				<View style={[this.state.isValid ? textFieldStyle : invalidTextFieldStyle, { flexDirection: 'row', display: 'flex', justifyContent: 'flex-end', backgroundColor: 'red'}]}>
+					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+					{ this.props.isSecured && this.renderVisibilityIcon() }
+				</View>
+			</View>
+		)
+	}
+
 	render() {
-		const { title, textType } = this.props;
+		const { title } = this.props;
 		return (
 			<View style={this.props.style}>
 				{this.renderTitle(title)}
-				{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+				{ this.renderTextField() }
 				{ !this.state.isValid && this.renderInvalidHint()}
 			</View>
 		);
