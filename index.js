@@ -19,6 +19,7 @@ export default class TextField extends Component {
 		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
 		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
+		customMask		: PropTypes.string,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
 		textInputStyle	: PropTypes.object,
@@ -47,6 +48,7 @@ export default class TextField extends Component {
 		autoCapitalize: 'none',
 		autoCorrect	: false,
 		textType 	: 'default',
+		customMask	: '',
 		isRequired	: false,
 		isRequiredHint : 'Field is required.',
 		isSecured	: false,
@@ -115,6 +117,44 @@ export default class TextField extends Component {
 		}
 	}
 
+	getMaskType = () => {
+		switch (this.props.textType) {
+			case 'price':
+				return 'money'
+			case 'datetime':
+				return 'datetime'
+			default:
+				return 'custom'
+		}
+	}
+
+	getMaskOptions = () => {
+		switch (this.props.textType) {
+			case 'price':
+				return {
+					unit: '$',
+					separator: '.',
+					delimiter: ',',
+				}
+			case 'datetime':
+				return {
+					format: 'YYYY/MM/DD'
+				}
+			default:
+				return {
+					/**
+					 * mask: (String | required | default '')
+					 * the mask pattern
+					 * 9 - accept digit.
+					 * A - accept alpha.
+					 * S - accept alphanumeric.
+					 * * - accept all, EXCEPT white space.
+					*/
+					mask: this.props.customMask || ''
+				  }
+		}
+	}
+
 	renderMaskedTextInput = () => {
 		const { placeholder } = this.props;
 		return (
@@ -122,12 +162,8 @@ export default class TextField extends Component {
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
-					type={'money'}
-					options={{
-						unit: '$',
-						separator: '.',
-						delimiter: ',',
-					}}
+					type={this.getMaskType()}
+					options={this.getMaskOptions()}
 					style={this.stylishTextInput()}
 					value={this.state.text}
 					placeholder={placeholder}
