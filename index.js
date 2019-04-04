@@ -117,7 +117,7 @@ export default class TextField extends Component {
 	renderMaskedTextInput = () => {
 		const { placeholder } = this.props;
 		return (
-			<View style={{ flex: 1, backgroundColor: 'green'}}>
+			<View style={{ flex: 1}}>
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
@@ -222,7 +222,7 @@ export default class TextField extends Component {
 		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
 		return (
 			<View style={{ width: this.props.width || deviceWidth }}>
-				<View style={[this.state.isValid ? textFieldStyle : invalidTextFieldStyle, { flexDirection: 'row', display: 'flex', justifyContent: 'flex-end', backgroundColor: 'red'}]}>
+				<View style={[this.state.isValid ? textFieldStyle : invalidTextFieldStyle, { flexDirection: 'row', display: 'flex', justifyContent: 'flex-end'}]}>
 					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
 					{ this.props.isSecured && this.renderVisibilityIcon() }
 				</View>
