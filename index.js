@@ -29,7 +29,6 @@ export default class TextField extends Component {
 		invalidTextFieldStyle : PropTypes.object,
 		invalidHint		: PropTypes.string,
 		invalidHintStyle: PropTypes.object,
-		hintHeight 		: PropTypes.number
 	};
 
 	static defaultProps = {
@@ -45,7 +44,6 @@ export default class TextField extends Component {
 		isSecured	: false,
 		onValidate	: null,
 		invalidHint : 'Your input is not valid.',
-		hintHeight	: 20,
 		textFieldStyle : {
 			borderWidth: 1, 
 			borderRadius: 4, 
@@ -176,11 +174,11 @@ export default class TextField extends Component {
 
 	renderInvalidHint = () => {
 		return (
-			<View style={{ height: this.props.hintHeight }}>
+			<View>
 				{ 
 					!this.state.isValid &&
 					<Text
-						numberOfLines={1}
+						numberOfLines={0}
 						ellipsizeMode="tail"
 						style={[styles.invalidHint, this.props.invalidHintStyle]}
 					>{ this.state.invalidMessage }</Text> 
@@ -229,14 +227,20 @@ export default class TextField extends Component {
 
 	validate(text) {
 		if (this.props.onValidate) {
-			if (this.props.onValidate(text) === true) {
+			const validateResult = this.props.onValidate(text)
+			if (validateResult === true) {
 				this.setState({
 					isValid: true
 				})
 			} else {
-				this.setState({
-					isValid: false
-				})
+				if (validateResult === false) {
+					this.setState({
+						isValid: false
+					})
+				}
+				if (validateResult !== false && typeof(validateResult) === 'string') {
+					this.setAsInvalid(validateResult)
+				}
 			}
 			// this.setState({
 			// 	isValid: this.props.onValidate(text)
