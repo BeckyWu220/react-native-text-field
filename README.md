@@ -106,6 +106,9 @@ render() {
       placeholderStyle={{ color: '#BCC4D1' }}
       invalidTextFieldStyle={{ borderColor: '#EF6C40' }}
       invalidHintStyle=={{ fontSize: 10 }}
+      visibilityIconTintColor={"#00ff00"}
+	  visibilityIconSource={require('@Images/defaultIcon.png') }
+	  invisibilityIconSource={require('@Images/defaultIcon.png') }
     />
    )
 }
@@ -124,3 +127,6 @@ render() {
 | placeholderStyle | Optional. Style of the placeholder. |
 | invalidTextFieldStyle | Optional. Style of the text field when the validation fails. For example, highlight the text field border as red when there's error in the content of the text field. |
 | invalidHintStyle | Optional. Style of the error message which will be displayed under the text field if there are any errors. |
+| visibilityIconTintColor | Optional. The tint color of the visible/invisible icon for secured text field. By default, tint color is null.|
+| visibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
+| invisibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |

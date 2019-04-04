@@ -22,13 +22,16 @@ export default class TextField extends Component {
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
 		placeholderStyle: PropTypes.object,
-		selectionColor	: PropTypes.string,
+		selectionColor	: PropTypes.color,
 		isRequired		: PropTypes.bool,
 		isSecured		: PropTypes.bool,
 		onValidate		: PropTypes.func,
 		invalidTextFieldStyle : PropTypes.object,
 		invalidHint		: PropTypes.string,
 		invalidHintStyle: PropTypes.object,
+		visibilityIconTintColor: PropTypes.color,
+		invisibilityIconSource: PropTypes.object,
+		visibilityIconSource: PropTypes.object
 	};
 
 	static defaultProps = {
@@ -44,16 +47,9 @@ export default class TextField extends Component {
 		isSecured	: false,
 		onValidate	: null,
 		invalidHint : 'Your input is not valid.',
-		textFieldStyle : {
-			borderWidth: 1, 
-			borderRadius: 4, 
-			borderColor: '#000000'
-		},
-		invalidTextFieldStyle : {
-			borderWidth: 1, 
-			borderRadius: 4, 
-			borderColor: '#ff0000'
-		}
+		textFieldStyle : styles.textField,
+		invalidTextFieldStyle : styles.invalidTextField,
+		visibilityIconTintColor: null
 	};
 
 	state = {
@@ -142,9 +138,9 @@ export default class TextField extends Component {
 	stylishTextInput = () => {
 		const { cellHeight } = this.props;
 		if (this.state.isValid) {
-			return [styles.textField, { height: cellHeight }];
+			return [styles.textInput, { height: cellHeight }];
 		}
-		return [styles.textField, { height: cellHeight }];
+		return [styles.textInput, { height: cellHeight }];
 	}
 
 	renderTextInput = () => {
@@ -190,13 +186,13 @@ export default class TextField extends Component {
 	renderVisibilityIcon = () => {
 		var visibleIconWidth = Math.min(this.props.cellHeight, CELL_HEIGHT)
 		return (
-			<TouchableOpacity style={{ width: visibleIconWidth, height: visibleIconWidth, alignItems: 'flex-end', alignItems: 'center', justifyContent: 'center'}} onPress={() => { 
+			<TouchableOpacity style={{ width: visibleIconWidth, height: visibleIconWidth, ...styles.central}} onPress={() => { 
 				this.setState({ 
 					isVisible: !this.state.isVisible
 				}) }}>
 				{ 	this.state.isVisible ? 
-					<Image source={require('./images/invisible.png')} resizeMode="contain" style={{ flex: 1, tintColor: 'grey' }} width={24} height={24}/> :
-					<Image source={require('./images/visible.png')} resizeMode="contain" style={{ flex: 1, tintColor: 'grey' }} width={24} height={24}/> 
+					<Image source={ this.props.invisibilityIconSource || require('./images/invisible.png')} resizeMode="contain" style={{ tintColor: this.props.visibilityIconTintColor }} width={24} height={24}/> :
+					<Image source={ this.props.visibilityIconSource || require('./images/visible.png')} resizeMode="contain" style={{ tintColor: this.props.visibilityIconTintColor }} width={24} height={24}/> 
 				}
 			</TouchableOpacity>
 		)
@@ -206,7 +202,7 @@ export default class TextField extends Component {
 		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
 		return (
 			<View>
-				<View style={[this.state.isValid ? textFieldStyle : invalidTextFieldStyle, { flexDirection: 'row', display: 'flex', justifyContent: 'flex-end'}]}>
+				<View style={[styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]}>
 					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
 					{ this.props.isSecured && this.renderVisibilityIcon() }
 				</View>

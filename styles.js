@@ -5,13 +5,11 @@ export default styles = StyleSheet.create({
         fontSize    : 17,
         color       : '#000000',
     },
-    textField : {
+    textInput : {
         height              : 44,
-        backgroundColor     : 'transparent',
+        backgroundColor     : 'orange', //'transparent',
         fontSize            : 18,
-        padding             : 10,
         textAlignVertical   : 'top',
-        width: '100%'
     },
     placeholderContainer : {
         position    :  'absolute',
@@ -27,5 +25,28 @@ export default styles = StyleSheet.create({
     invalidHint : {
         fontSize    : 14,
         color       : '#ff0000',
-    }
+    },
+    central : {
+        alignItems: 'center', 
+        justifyContent: 'center'
+    },
+    flexRowEnd: {
+        flexDirection: 'row', 
+        display: 'flex', 
+        justifyContent: 'flex-end'
+    },
+    defaultPadding: {
+        paddingLeft: 10, 
+        paddingRight: 10
+    },
+    textField: {
+        borderWidth: 1, 
+        borderRadius: 4, 
+        borderColor: '#000000'
+    },
+    invalidTextField: {
+        borderWidth: 1, 
+        borderRadius: 4, 
+        borderColor: '#ff0000'
+    },
 });
