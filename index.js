@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Platform, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text';
 import PropTypes from 'prop-types';
 import styles from './styles';
 
 const CELL_HEIGHT = 40;
-const deviceWidth = Dimensions.get('window').width;
 
 export default class TextField extends Component {
 	static propTypes = {
@@ -14,7 +13,7 @@ export default class TextField extends Component {
 		placeholder 	: PropTypes.string,
 		cellHeight		: PropTypes.number,
 		isMultiline		: PropTypes.bool,
-		width			: PropTypes.number,
+		width			: PropTypes.number, //Optional
 		style			: PropTypes.style,
 		onInputChange 	: PropTypes.func,
 		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
@@ -177,7 +176,7 @@ export default class TextField extends Component {
 
 	renderInvalidHint = () => {
 		return (
-			<View style={{ height: this.props.hintHeight, width: this.props.width || deviceWidth }}>
+			<View style={{ height: this.props.hintHeight }}>
 				{ 
 					!this.state.isValid &&
 					<Text
@@ -208,7 +207,7 @@ export default class TextField extends Component {
 	renderTextField = () => {
 		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
 		return (
-			<View style={{ width: this.props.width || deviceWidth }}>
+			<View>
 				<View style={[this.state.isValid ? textFieldStyle : invalidTextFieldStyle, { flexDirection: 'row', display: 'flex', justifyContent: 'flex-end'}]}>
 					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
 					{ this.props.isSecured && this.renderVisibilityIcon() }
@@ -218,10 +217,10 @@ export default class TextField extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, cellHeight } = this.props;
 		return (
-			<View style={this.props.style}>
-				{this.renderTitle(title)}
+			<View style={[this.props.style, this.props.width ? { width: this.props.width } : null]}>
+				{ this.renderTitle(title) }
 				{ this.renderTextField() }
 				{ !this.state.isValid && this.renderInvalidHint()}
 			</View>
