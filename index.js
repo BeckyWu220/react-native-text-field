@@ -70,7 +70,7 @@ export default class TextField extends Component {
 		this.setState({
 			text: this.props.value,
 			invalidMessage: this.props.invalidHint,
-			isVisible: this.props.isSecured
+			isVisible: !this.props.isSecured
 		});
 	}
 
@@ -129,7 +129,7 @@ export default class TextField extends Component {
 					}}
 					style={this.stylishTextInput()}
 					value={this.state.text}
-					placeholder={Platform.OS === 'ios' ? placeholder : ''}
+					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
 					keyboardType={'numeric'}
@@ -138,7 +138,6 @@ export default class TextField extends Component {
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
 				/>
-				{ Platform.OS !== 'ios' && this.renderPlaceholder() }
 			</View>
 		);
 	}
@@ -161,7 +160,7 @@ export default class TextField extends Component {
 					autoCorrect={this.props.autoCorrect}
 					style={this.stylishTextInput()}
 					value={this.state.text}
-					placeholder={Platform.OS === 'ios' ? placeholder : ''}
+					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
 					editable={true}
@@ -172,20 +171,8 @@ export default class TextField extends Component {
 					secureTextEntry={!this.state.isVisible}
 					onEndEditing={(event) => this.validate(event.nativeEvent.text)}
 				/>
-				{ Platform.OS !== 'ios' && this.renderPlaceholder() }
 			</View>
 		);
-	}
-
-	renderPlaceholder = () => {
-		if (this.state.text === null || this.state.text === '') {
-			return (
-				<View pointerEvents='none' style={{...styles.placeholderContainer, justifyContent: !this.props.isMultiline ? 'center' : 'flex-start'}}>
-					<Text style={[styles.placeholderText, this.props.placeholderStyle]}>{this.props.placeholder}</Text>
-				</View>
-			);
-		}
-		return null;
 	}
 
 	renderInvalidHint = () => {
