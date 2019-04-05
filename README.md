@@ -130,3 +130,5 @@ render() {
 | visibilityIconTintColor | Optional. The tint color of the visible/invisible icon for secured text field. By default, tint color is null.|
 | visibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
 | invisibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
+
+![](https://raw.githubusercontent.com/BeckyWu220/react-native-text-field/visibleIconForSecuredField/screenshot.png)
