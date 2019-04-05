@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Platform, Dimensions } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
 import PropTypes from 'prop-types';
 import styles from './styles';
-import { TextInputMask } from 'react-native-masked-text';
 
 const CELL_HEIGHT = 40;
-const deviceWidth = Dimensions.get('window').width;
 
 export default class TextField extends Component {
 	static propTypes = {
@@ -14,25 +13,28 @@ export default class TextField extends Component {
 		placeholder 	: PropTypes.string,
 		cellHeight		: PropTypes.number,
 		isMultiline		: PropTypes.bool,
-		width			: PropTypes.number,
+		width			: PropTypes.number, //Optional
 		style			: PropTypes.style,
 		onInputChange 	: PropTypes.func,
 		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
 		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
-		marginLeft		: PropTypes.number,
-		marginRight		: PropTypes.number,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
+		textInputStyle	: PropTypes.object,
 		placeholderStyle: PropTypes.object,
-		selectionColor	: PropTypes.string,
+		selectionColor	: PropTypes.color,
 		isRequired		: PropTypes.bool,
 		isSecured		: PropTypes.bool,
 		onValidate		: PropTypes.func,
+		validateAsTyping: PropTypes.bool,
 		invalidTextFieldStyle : PropTypes.object,
+		invalidTextInputStyle : PropTypes.object,
 		invalidHint		: PropTypes.string,
 		invalidHintStyle: PropTypes.object,
-		hintHeight 		: PropTypes.number
+		visibilityIconTintColor: PropTypes.color,
+		invisibilityIconSource: PropTypes.object,
+		visibilityIconSource: PropTypes.object
 	};
 
 	static defaultProps = {
@@ -44,25 +46,28 @@ export default class TextField extends Component {
 		autoCapitalize: 'none',
 		autoCorrect	: false,
 		textType 	: 'default',
-        marginLeft	: 15,
-		marginRight	: 15,
 		isRequired	: false,
 		isSecured	: false,
 		onValidate	: null,
+		validateAsTyping: false,
 		invalidHint : 'Your input is not valid.',
-		hintHeight	: 20
+		textFieldStyle : styles.textField,
+		invalidTextFieldStyle : styles.invalidTextField,
+		visibilityIconTintColor: null
 	};
 
 	state = {
 		text: null,
 		isValid: true,
 		invalidMessage: '',
+		isVisible: true
 	}
 
 	componentDidMount() {
 		this.setState({
 			text: this.props.value,
-			invalidMessage: this.props.invalidHint
+			invalidMessage: this.props.invalidHint,
+			isVisible: !this.props.isSecured
 		});
 	}
 
@@ -91,7 +96,9 @@ export default class TextField extends Component {
 		this.setState({
 			text
 		}, () => {
-			this.validate(text);
+			if (this.props.validateAsTyping) {
+				this.validate(text);
+			}
 			this.props.onInputChange(text);
 		});	
 	}
@@ -107,9 +114,9 @@ export default class TextField extends Component {
 	}
 
 	renderMaskedTextInput = () => {
-		const { placeholder, cellHeight, marginLeft, marginRight } = this.props;
+		const { placeholder } = this.props;
 		return (
-			<View style={{width: this.props.width || deviceWidth}}>
+			<View style={{ flex: 1}}>
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
@@ -119,9 +126,9 @@ export default class TextField extends Component {
 						separator: '.',
 						delimiter: ',',
 					}}
-					style={[styles.textField, this.props.textFieldStyle, { height: cellHeight, marginLeft, marginRight }]}
+					style={this.stylishTextInput()}
 					value={this.state.text}
-					placeholder={Platform.OS === 'ios' ? placeholder : ''}
+					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
 					keyboardType={'numeric'}
@@ -130,30 +137,29 @@ export default class TextField extends Component {
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
 				/>
-				{ Platform.OS !== 'ios' && this.renderPlaceholder() }
 			</View>
 		);
 	}
 
 	stylishTextInput = () => {
-		const { cellHeight } = this.props;
+		const { cellHeight, textInputStyle, invalidTextInputStyle } = this.props;
 		if (this.state.isValid) {
-			return [styles.textField, this.props.textFieldStyle, { height: cellHeight }];
+			return [styles.textInput, textInputStyle , { height: cellHeight }];
 		}
-		return [styles.invalidTextField, this.props.invalidTextFieldStyle, { height: cellHeight }];
+		return [styles.textInput, textInputStyle, invalidTextInputStyle, { height: cellHeight }];
 	}
 
 	renderTextInput = () => {
-		const { placeholder, cellHeight } = this.props;
+		const { placeholder} = this.props;
 		return (
-			<View style={{width: this.props.width || deviceWidth}}>
+			<View style={{ flex: 1 }}>
 				<TextInput
 					allowFontScaling={false}
 					autoCapitalize={this.props.autoCapitalize}
 					autoCorrect={this.props.autoCorrect}
 					style={this.stylishTextInput()}
 					value={this.state.text}
-					placeholder={Platform.OS === 'ios' ? placeholder : ''}
+					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
 					editable={true}
@@ -161,32 +167,20 @@ export default class TextField extends Component {
 					onChangeText={this.onTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
-					secureTextEntry={this.props.isSecured}
+					secureTextEntry={!this.state.isVisible}
 					onEndEditing={(event) => this.validate(event.nativeEvent.text)}
 				/>
-				{ Platform.OS !== 'ios' && this.renderPlaceholder() }
 			</View>
 		);
 	}
 
-	renderPlaceholder = () => {
-		if (this.state.text === null || this.state.text === '') {
-			return (
-				<View pointerEvents='none' style={{...styles.placeholderContainer, justifyContent: !this.props.isMultiline ? 'center' : 'flex-start'}}>
-					<Text style={[styles.placeholderText, this.props.placeholderStyle]}>{this.props.placeholder}</Text>
-				</View>
-			);
-		}
-		return null;
-	}
-
 	renderInvalidHint = () => {
 		return (
-			<View style={{ height: this.props.hintHeight, width: this.props.width || deviceWidth }}>
+			<View>
 				{ 
 					!this.state.isValid &&
 					<Text
-						numberOfLines={1}
+						numberOfLines={0}
 						ellipsizeMode="tail"
 						style={[styles.invalidHint, this.props.invalidHintStyle]}
 					>{ this.state.invalidMessage }</Text> 
@@ -195,12 +189,39 @@ export default class TextField extends Component {
 		)
 	}
 
-	render() {
-		const { title, textType } = this.props;
+	renderVisibilityIcon = () => {
+		var visibleIconWidth = Math.min(this.props.cellHeight, CELL_HEIGHT)
 		return (
-			<View style={this.props.style}>
-				{this.renderTitle(title)}
-				{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+			<TouchableOpacity style={{ width: visibleIconWidth, height: visibleIconWidth, ...styles.central}} onPress={() => { 
+				this.setState({ 
+					isVisible: !this.state.isVisible
+				}) }}>
+				{ 	this.state.isVisible ? 
+					<Image source={ this.props.invisibilityIconSource || require('./images/invisible.png')} resizeMode="contain" style={{ tintColor: this.props.visibilityIconTintColor }} width={24} height={24}/> :
+					<Image source={ this.props.visibilityIconSource || require('./images/visible.png')} resizeMode="contain" style={{ tintColor: this.props.visibilityIconTintColor }} width={24} height={24}/> 
+				}
+			</TouchableOpacity>
+		)
+	}
+
+	renderTextField = () => {
+		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
+		return (
+			<View>
+				<View style={[styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]}>
+					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+					{ this.props.isSecured && this.renderVisibilityIcon() }
+				</View>
+			</View>
+		)
+	}
+
+	render() {
+		const { title, cellHeight } = this.props;
+		return (
+			<View style={[this.props.style, this.props.width ? { width: this.props.width } : null]}>
+				{ this.renderTitle(title) }
+				{ this.renderTextField() }
 				{ !this.state.isValid && this.renderInvalidHint()}
 			</View>
 		);
@@ -208,14 +229,20 @@ export default class TextField extends Component {
 
 	validate(text) {
 		if (this.props.onValidate) {
-			if (this.props.onValidate(text) === true) {
+			const validateResult = this.props.onValidate(text)
+			if (validateResult === true) {
 				this.setState({
 					isValid: true
 				})
 			} else {
-				this.setState({
-					isValid: false
-				})
+				if (validateResult === false) {
+					this.setState({
+						isValid: false
+					})
+				}
+				if (validateResult !== false && typeof(validateResult) === 'string') {
+					this.setAsInvalid(validateResult)
+				}
 			}
 			// this.setState({
 			// 	isValid: this.props.onValidate(text)
