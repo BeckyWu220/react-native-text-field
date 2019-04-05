@@ -6,7 +6,8 @@ For the text validation, the `react-native-text-field` provides `onValidate` pro
 
 For example, a Password field might need to be **longer than 4 digits**, and **contains letters** at the same time. 
 
-<a href="https://imgflip.com/gif/2hwciw"><img src="https://i.imgflip.com/2hwciw.gif" title="made at imgflip.com"/></a>
+
+<img src="https://media.giphy.com/media/e5RznpgXUpzxx3yjxZ/source.mp4"/>
 
 ## Installation
 
