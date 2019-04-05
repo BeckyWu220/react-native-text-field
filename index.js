@@ -21,12 +21,15 @@ export default class TextField extends Component {
 		textType 		: PropTypes.string,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
+		textInputStyle	: PropTypes.object,
 		placeholderStyle: PropTypes.object,
 		selectionColor	: PropTypes.color,
 		isRequired		: PropTypes.bool,
 		isSecured		: PropTypes.bool,
 		onValidate		: PropTypes.func,
+		validateAsTyping: PropTypes.bool,
 		invalidTextFieldStyle : PropTypes.object,
+		invalidTextInputStyle : PropTypes.object,
 		invalidHint		: PropTypes.string,
 		invalidHintStyle: PropTypes.object,
 		visibilityIconTintColor: PropTypes.color,
@@ -46,6 +49,7 @@ export default class TextField extends Component {
 		isRequired	: false,
 		isSecured	: false,
 		onValidate	: null,
+		validateAsTyping: false,
 		invalidHint : 'Your input is not valid.',
 		textFieldStyle : styles.textField,
 		invalidTextFieldStyle : styles.invalidTextField,
@@ -92,7 +96,9 @@ export default class TextField extends Component {
 		this.setState({
 			text
 		}, () => {
-			this.validate(text);
+			if (this.props.validateAsTyping) {
+				this.validate(text);
+			}
 			this.props.onInputChange(text);
 		});	
 	}
@@ -136,11 +142,11 @@ export default class TextField extends Component {
 	}
 
 	stylishTextInput = () => {
-		const { cellHeight } = this.props;
+		const { cellHeight, textInputStyle, invalidTextInputStyle } = this.props;
 		if (this.state.isValid) {
-			return [styles.textInput, { height: cellHeight }];
+			return [styles.textInput, textInputStyle , { height: cellHeight }];
 		}
-		return [styles.textInput, { height: cellHeight }];
+		return [styles.textInput, textInputStyle, invalidTextInputStyle, { height: cellHeight }];
 	}
 
 	renderTextInput = () => {
