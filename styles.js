@@ -7,7 +7,7 @@ export default styles = StyleSheet.create({
     },
     textInput : {
         height              : 44,
-        backgroundColor     : 'orange', //'transparent',
+        backgroundColor     : 'transparent',
         fontSize            : 18,
         textAlignVertical   : 'top',
     },
