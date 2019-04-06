@@ -58,6 +58,7 @@ render() {
 			}
 			onValidate={text => this.validatePassword(text)}
 			invalidHint="Password is not valid."
+			validateAsTyping={true}
 			isSecured={true}
 		/>
 	)
@@ -82,10 +83,16 @@ validatePassword = (password) => {
 |-------------| -------------|
 | onValidate  | Optional. Validation handler method that will be called when the text in the text field changes. Return `true` to indicate the text is valid. Return error message string to indicate the text doesn't match certain criteria. Return `false` to use the general error message, which is the value of `invalidHint` props. **If this props is omitted, the validation won't be triggered.**  |
 | invalidHint | Optional. General error message if the text validation fails. The default value of this props is 'Your input is not valid.' |
+| validateAsTyping | Optional. If you need to validate the text content whenever the text changes, set this to true. By default, the validation will only be triggered when the user leaves the text field. |
 | isSecured  | Optional. Display text in the text field as `*`. The text field will have a switchable icon to change between visible and invisible.|
 
 
 ## Style Customization
+
+Samples of text fields that were made with `react-native-text-field`.
+
+![](https://raw.githubusercontent.com/BeckyWu220/react-native-text-field/visibleIconForSecuredField/screenshot.png)
+
 ```
 render() {
   return(
@@ -104,8 +111,10 @@ render() {
       style={{ marginTop: 20, marginBottom: 100 }}
       titleStyle={{ color: '#5D95EF' }}
       textFieldStyle={{ borderColor: '#BCC4D1' }}
+      textInputStyle={{ color: '#000000' }
       placeholderStyle={{ color: '#BCC4D1' }}
       invalidTextFieldStyle={{ borderColor: '#EF6C40' }}
+      invalidTextInputStyle={{ color: '#FF0000' }}
       invalidHintStyle=={{ fontSize: 10 }}
       visibilityIconTintColor={"#00ff00"}
 	  visibilityIconSource={require('@Images/defaultIcon.png') }
@@ -115,6 +124,7 @@ render() {
 }
 
 ```
+
 | Props       | Description |
 |-------------| -------------|
 | cellHeight  | Optional. Height of the text input. |
@@ -125,11 +135,11 @@ render() {
 | style		 | Optional. Style of the whole text field container. |
 | titleStyle  | Optional. Style of the text field title. |
 | textFieldStyle | Optional. Style of the text field. For example, making it as a round cornered box or a single underline slot. |
+| textInputStyle | Optional. Style of the text in the text field.|
 | placeholderStyle | Optional. Style of the placeholder. |
 | invalidTextFieldStyle | Optional. Style of the text field when the validation fails. For example, highlight the text field border as red when there's error in the content of the text field. |
+| invalidTextInputStyle | Optional. Style of invalid text style in the text field. By defaut, it's using the same value of `textInputStyle`|
 | invalidHintStyle | Optional. Style of the error message which will be displayed under the text field if there are any errors. |
 | visibilityIconTintColor | Optional. The tint color of the visible/invisible icon for secured text field. By default, tint color is null.|
 | visibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
 | invisibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
-
-![](https://raw.githubusercontent.com/BeckyWu220/react-native-text-field/visibleIconForSecuredField/screenshot.png)
