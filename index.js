@@ -25,6 +25,7 @@ export default class TextField extends Component {
 		placeholderStyle: PropTypes.object,
 		selectionColor	: PropTypes.color,
 		isRequired		: PropTypes.bool,
+		isRequiredHint	: PropTypes.string,
 		isSecured		: PropTypes.bool,
 		onValidate		: PropTypes.func,
 		validateAsTyping: PropTypes.bool,
@@ -47,6 +48,7 @@ export default class TextField extends Component {
 		autoCorrect	: false,
 		textType 	: 'default',
 		isRequired	: false,
+		isRequiredHint : 'Field is required.',
 		isSecured	: false,
 		onValidate	: null,
 		validateAsTyping: false,
@@ -228,6 +230,17 @@ export default class TextField extends Component {
 	}
 
 	validate(text) {
+		if (this.props.isRequired) {
+			if (!text) {
+				this.setAsInvalid(this.props.isRequiredHint)
+				return 
+			} else {
+				this.setState({
+					isValid: true
+				})
+			}
+		}
+
 		if (this.props.onValidate) {
 			const validateResult = this.props.onValidate(text)
 			if (validateResult === true) {

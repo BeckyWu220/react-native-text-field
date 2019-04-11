@@ -60,6 +60,8 @@ render() {
 			invalidHint="Password is not valid."
 			validateAsTyping={true}
 			isSecured={true}
+			isRequired={true}
+			isRequiredHint="Password cannot be empty."
 		/>
 	)
 }
@@ -85,6 +87,8 @@ validatePassword = (password) => {
 | invalidHint | Optional. General error message if the text validation fails. The default value of this props is 'Your input is not valid.' |
 | validateAsTyping | Optional. If you need to validate the text content whenever the text changes, set this to true. By default, the validation will only be triggered when the user leaves the text field. |
 | isSecured  | Optional. Display text in the text field as `*`. The text field will have a switchable icon to change between visible and invisible.|
+| isRequired | Optional. If a field is marked as required, the text field automatically check whether or not the content is empty, and display error message. The default value is false.|
+| isRequiredHint | Optional. The error message string when a text field is marked as required, but the content is empty. By default, the message is 'Field is required.' |
 
 
 ## Style Customization
@@ -143,3 +147,8 @@ render() {
 | visibilityIconTintColor | Optional. The tint color of the visible/invisible icon for secured text field. By default, tint color is null.|
 | visibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
 | invisibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
+
+## Migrating from 2.x to 3.x
+In 2.x, the `react-native-text-field` is validating the text field content as per typing. In 3.x, `validateAsTyping` props were added with default value false. If you need to keep validating your text field whenever the text changes, please manually assign `validateAsTyping` to `true`. Otherwise, the validation will be executed **once only** when user leaves the text field. 
+
+If you are using `width` props of `react-native-text-field`, you might be just well without changing anything since the `width` takes higher priority than `width` in `style` props. If you notice that your horizontal margin looks not correct, please use `marginLeft` and `marginRight` in `style` props to adjust the margin to the left and right edge of the screen. 
