@@ -91,7 +91,7 @@ export default class TextField extends Component {
 	onMaskedTextChange = (text) => {
 		const rawText = this.maskedTextInput.getRawValue();
 		this.setState({
-			text
+			text: rawText
 		});
 		this.props.onInputChange(rawText);
 	}
@@ -191,6 +191,7 @@ export default class TextField extends Component {
 					onChangeText={this.onMaskedTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
+					maxLength={this.props.customMask ? this.props.customMask.split('').length : undefined}
 				/>
 			</View>
 		);
