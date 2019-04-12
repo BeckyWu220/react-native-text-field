@@ -150,7 +150,24 @@ export default class TextField extends Component {
 					 * S - accept alphanumeric.
 					 * * - accept all, EXCEPT white space.
 					*/
-					mask: this.props.customMask || ''
+					mask: this.props.customMask || '',
+					getRawValue: (value) => {
+						if (this.props.customMask) {
+							let maskCharacters = this.props.customMask.split('')
+							var indiceToKeep = []
+							maskCharacters.map((char, index) => {
+								if (char == '9' || char == 'A' || char == 'S' || char == '*') {
+									indiceToKeep.push(index)
+								}
+							})
+							let valueCharacters = value.split('')
+							let rawValue = valueCharacters.filter((char, index) => {
+								return indiceToKeep.includes(index)
+							}).join('')
+							if (__DEV__) console.log('Value', value, 'RawValue', rawValue)
+							return rawValue
+						}
+					}
 				  }
 		}
 	}
@@ -247,7 +264,7 @@ export default class TextField extends Component {
 		return (
 			<View>
 				<View style={[styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]}>
-					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+					{ textType == 'default' ? this.renderTextInput() : this.renderMaskedTextInput()}
 					{ this.props.isSecured && this.renderVisibilityIcon() }
 				</View>
 			</View>
