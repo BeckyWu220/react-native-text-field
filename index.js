@@ -20,6 +20,7 @@ export default class TextField extends Component {
 		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
 		customMask		: PropTypes.string,
+		maskOptions		: PropTypes.object,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
 		textInputStyle	: PropTypes.object,
@@ -49,6 +50,7 @@ export default class TextField extends Component {
 		autoCorrect	: false,
 		textType 	: 'default',
 		customMask	: '',
+		maskOptions : {},
 		isRequired	: false,
 		isRequiredHint : 'Field is required.',
 		isSecured	: false,
@@ -92,8 +94,13 @@ export default class TextField extends Component {
 		const rawText = this.maskedTextInput.getRawValue();
 		this.setState({
 			text: rawText
+		}, () => {
+			if (this.props.validateAsTyping) {
+				this.validate(rawText);
+			}
+			this.props.onInputChange(rawText);
 		});
-		this.props.onInputChange(rawText);
+		
 	}
 
 	onTextChange = (text) => {
@@ -118,58 +125,46 @@ export default class TextField extends Component {
 	}
 
 	getMaskType = () => {
-		switch (this.props.textType) {
-			case 'price':
-				return 'money'
-			case 'datetime':
-				return 'datetime'
-			default:
-				return 'custom'
-		}
+		return this.props.textType
 	}
 
 	getMaskOptions = () => {
-		switch (this.props.textType) {
-			case 'price':
-				return {
-					unit: '$',
-					separator: '.',
-					delimiter: ',',
-				}
-			case 'datetime':
-				return {
-					format: 'YYYY/MM/DD'
-				}
-			default:
-				return {
-					/**
-					 * mask: (String | required | default '')
-					 * the mask pattern
-					 * 9 - accept digit.
-					 * A - accept alpha.
-					 * S - accept alphanumeric.
-					 * * - accept all, EXCEPT white space.
-					*/
-					mask: this.props.customMask || '',
-					getRawValue: (value) => {
-						if (this.props.customMask) {
-							let maskCharacters = this.props.customMask.split('')
-							var indiceToKeep = []
-							maskCharacters.map((char, index) => {
-								if (char == '9' || char == 'A' || char == 'S' || char == '*') {
-									indiceToKeep.push(index)
-								}
-							})
-							let valueCharacters = value.split('')
-							let rawValue = valueCharacters.filter((char, index) => {
-								return indiceToKeep.includes(index)
-							}).join('')
-							if (__DEV__) console.log('Value', value, 'RawValue', rawValue)
-							return rawValue
-						}
+		if (this.props.textType == 'custom') {
+			return {
+				/**
+				 * mask: (String | required | default '')
+				 * the mask pattern
+				 * 9 - accept digit.
+				 * A - accept alpha.
+				 * S - accept alphanumeric.
+				 * * - accept all, EXCEPT white space.
+				*/
+				mask: this.props.customMask || '',
+				getRawValue: (value, settings) => {
+					if (this.props.customMask) {
+						let maskCharacters = this.props.customMask.split('')
+						var indiceToKeep = []
+						maskCharacters.map((char, index) => {
+							if (char == '9' || char == 'A' || char == 'S' || char == '*') {
+								indiceToKeep.push(index)
+							}
+						})
+						let valueCharacters = value.split('')
+						let rawValue = valueCharacters.filter((char, index) => {
+							return indiceToKeep.includes(index)
+						}).join('')
+						if (__DEV__) console.log('Value', value, 'RawValue', rawValue)
+						return rawValue
 					}
-				  }
+				}
+			}
 		}
+
+		if (this.props.maskOptions) {
+			return this.props.maskOptions
+		}
+
+		return {}
 	}
 
 	renderMaskedTextInput = () => {
@@ -186,7 +181,6 @@ export default class TextField extends Component {
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
-					keyboardType={'numeric'}
 					editable={true}
 					onChangeText={this.onMaskedTextChange}
 					blurOnSubmit={true}
