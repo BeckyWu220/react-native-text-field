@@ -50,7 +50,7 @@ export default class TextField extends Component {
 		autoCorrect	: false,
 		textType 	: 'default',
 		customMask	: '',
-		maskOptions : {},
+		maskOptions : null,
 		isRequired	: false,
 		isRequiredHint : 'Field is required.',
 		isSecured	: false,
@@ -159,12 +159,41 @@ export default class TextField extends Component {
 				}
 			}
 		}
-
+		var maskOptions = {}
 		if (this.props.maskOptions) {
-			return this.props.maskOptions
+			maskOptions = this.props.maskOptions
+		} else {
+			switch(this.props.textType) {
+				case 'cel-phone':
+					maskOptions = {
+						maskType: 'INTERNATIONAL',
+						withDDD: false
+					}
+					break
+				case 'credit-card':
+					maskOptions = {
+						obfuscated: true,
+						issuer: 'visa'
+					}
+					break
+				
+				case 'money':
+					maskOptions = {
+						unit: '$',
+						separator: '.',
+						delimiter: ','
+					}
+					break
+				case 'datetime':
+					maskOptions = {
+						format: 'YYYY/MM/DD'
+					}
+					break
+				default: 
+					break
+			}
 		}
-
-		return {}
+		return maskOptions
 	}
 
 	renderMaskedTextInput = () => {
