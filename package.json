@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "react-native-masked-text": "^1.7.2",
+    "react-native-masked-text": "^1.12.1",
     "prop-types": "^15.6.0"
   },
   "peerDependencies": {
