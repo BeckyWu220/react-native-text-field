@@ -162,7 +162,7 @@ render() {
 | 'only-numbers' |
 | 'zip-code' |
 
-To use `react-native-masked-text` predefined masks, assign desired predefeind mask type to `textType` props. Each predefiend maks type has default maskOptions object, which can be overwritten via passing `maskOptions` props into the Text Field instance.
+To use `react-native-masked-text` predefined masks, assign desired predefeind mask type to `textType` props. Each predefiend mask type has default maskOptions object, which can be overwritten via passing `maskOptions` props into the Text Field instance.
 
 ```
 <TextField

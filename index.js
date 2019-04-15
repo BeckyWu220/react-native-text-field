@@ -78,11 +78,11 @@ export default class TextField extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.value !== this.props.value) {
-			this.setState({
-				text: nextProps.value
-			});
-		}
+		// if (nextProps.value !== this.props.value) {
+		// 	this.setState({
+		// 		text: nextProps.value
+		// 	});
+		// }
 		if (nextProps.invalidHint !== this.props.invalidHint) {
 			this.setState({
 				invalidMessage: nextProps.invalidHint
@@ -91,16 +91,18 @@ export default class TextField extends Component {
 	}
 
 	onMaskedTextChange = (text) => {
-		const rawText = this.maskedTextInput.getRawValue();
 		this.setState({
-			text: rawText
+			text
 		}, () => {
+			var rawText = this.maskedTextInput.getRawValue();
+			if (this.props.textType == 'credit-card') {
+				rawText = rawText.join('')
+			}
 			if (this.props.validateAsTyping) {
 				this.validate(rawText);
 			}
 			this.props.onInputChange(rawText);
 		});
-		
 	}
 
 	onTextChange = (text) => {
@@ -172,11 +174,10 @@ export default class TextField extends Component {
 					break
 				case 'credit-card':
 					maskOptions = {
-						obfuscated: true,
-						issuer: 'visa'
+						obfuscated: false,
+						issuer: 'visa-or-mastercard'
 					}
 					break
-				
 				case 'money':
 					maskOptions = {
 						unit: '$',
@@ -193,6 +194,7 @@ export default class TextField extends Component {
 					break
 			}
 		}
+		if (__DEV__) console.log(`Options: ${JSON.stringify(maskOptions, undefined, 2)}`)
 		return maskOptions
 	}
 
