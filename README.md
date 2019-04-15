@@ -148,6 +148,57 @@ render() {
 | visibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
 | invisibilityIconSource | Optional. Image source of the icon to indicate visiblity for secured text field. |
 
+## Mask Input
+
+### Use Predefined Mask
+`react-native-text-field` integrated `react-native-masked-text`for masked text, there for `react-native-text-field` supports almost all types of masks that `react-native-masked-text` provided. Check [https://www.npmjs.com/package/react-native-masked-text](https://www.npmjs.com/package/react-native-masked-text) for more details about how to defined your `maskOptions` object.
+
+| Predefined Mask Type |
+|-------------|
+| 'cel-phone' |
+| 'credit-card' |
+| 'datetime' |
+| 'money' |
+| 'only-numbers' |
+| 'zip-code' |
+
+To use `react-native-masked-text` predefined masks, assign desired predefeind mask type to `textType` props. Each predefiend mask type has default maskOptions object, which can be overwritten via passing `maskOptions` props into the Text Field instance.
+
+```
+<TextField
+	title='Payment Amount'
+	placeholder="Payment Amount"
+	onInputChange={(text) => this.onInputChange(text)}
+	textType={'money'}
+	maskOptions={{
+	    unit: '€',
+	    separator: '.',
+	    delimiter: ','
+	}}
+/>
+```
+| Props       | Description |
+|-------------| -------------|
+| textType  | Optional. Type of predefined mask that include 'cel-phone', 'credit-card', 'datetime', 'money', 'only-numbers', 'zip-code', etc.|
+| maskOptions | Optional. Each predefined type has default `maskOptions` object, which can be overwritten via passing `maskOptions` props into the Text Field instance. 
+
+### Customize Mask
+Besides using predefined masks, `react-native-masked-text` provide us the capability to customize masks. `react-native-text-field` support customizing masks as well. 
+
+To customize mask, assign 'custom' to props `textType`, and pass **mask string** into `customMask` props. Mask string is a string that contains '9', 'A', 'S' and '\*', where '9' represents digit, 'A' represents alpha, 'S' represents alphanumeric, and '*' represents all except white space.
+
+```
+<TextField
+	title='Customized Mask'
+	placeholder="Customized Mask"
+	onInputChange={(text) => this.onInputChange(text)}
+	textType={'custom'} 
+	customMask={'(999)-999-9999'}
+/>
+```
+
+In the example above, the text field is masking a phone number, for example,'7788550000' as '(778)-855-0000'.
+
 ## Migrating from 2.x to 3.x
 In 2.x, the `react-native-text-field` is validating the text field content as per typing. In 3.x, `validateAsTyping` props were added with default value false. If you need to keep validating your text field whenever the text changes, please manually assign `validateAsTyping` to `true`. Otherwise, the validation will be executed **once only** when user leaves the text field. 
 

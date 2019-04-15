@@ -19,6 +19,8 @@ export default class TextField extends Component {
 		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
 		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
+		customMask		: PropTypes.string,
+		maskOptions		: PropTypes.object,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
 		textInputStyle	: PropTypes.object,
@@ -47,6 +49,8 @@ export default class TextField extends Component {
 		autoCapitalize: 'none',
 		autoCorrect	: false,
 		textType 	: 'default',
+		customMask	: '',
+		maskOptions : null,
 		isRequired	: false,
 		isRequiredHint : 'Field is required.',
 		isSecured	: false,
@@ -74,11 +78,11 @@ export default class TextField extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.value !== this.props.value) {
-			this.setState({
-				text: nextProps.value
-			});
-		}
+		// if (nextProps.value !== this.props.value) {
+		// 	this.setState({
+		// 		text: nextProps.value
+		// 	});
+		// }
 		if (nextProps.invalidHint !== this.props.invalidHint) {
 			this.setState({
 				invalidMessage: nextProps.invalidHint
@@ -87,11 +91,18 @@ export default class TextField extends Component {
 	}
 
 	onMaskedTextChange = (text) => {
-		const rawText = this.maskedTextInput.getRawValue();
 		this.setState({
 			text
+		}, () => {
+			var rawText = this.maskedTextInput.getRawValue();
+			if (this.props.textType == 'credit-card') {
+				rawText = rawText.join('')
+			}
+			if (this.props.validateAsTyping) {
+				this.validate(rawText);
+			}
+			this.props.onInputChange(rawText);
 		});
-		this.props.onInputChange(rawText);
 	}
 
 	onTextChange = (text) => {
@@ -115,6 +126,78 @@ export default class TextField extends Component {
 		}
 	}
 
+	getMaskType = () => {
+		return this.props.textType
+	}
+
+	getMaskOptions = () => {
+		if (this.props.textType == 'custom') {
+			return {
+				/**
+				 * mask: (String | required | default '')
+				 * the mask pattern
+				 * 9 - accept digit.
+				 * A - accept alpha.
+				 * S - accept alphanumeric.
+				 * * - accept all, EXCEPT white space.
+				*/
+				mask: this.props.customMask || '',
+				getRawValue: (value, settings) => {
+					if (this.props.customMask) {
+						let maskCharacters = this.props.customMask.split('')
+						var indiceToKeep = []
+						maskCharacters.map((char, index) => {
+							if (char == '9' || char == 'A' || char == 'S' || char == '*') {
+								indiceToKeep.push(index)
+							}
+						})
+						let valueCharacters = value.split('')
+						let rawValue = valueCharacters.filter((char, index) => {
+							return indiceToKeep.includes(index)
+						}).join('')
+						if (__DEV__) console.log('Value', value, 'RawValue', rawValue)
+						return rawValue
+					}
+				}
+			}
+		}
+		var maskOptions = {}
+		if (this.props.maskOptions) {
+			maskOptions = this.props.maskOptions
+		} else {
+			switch(this.props.textType) {
+				case 'cel-phone':
+					maskOptions = {
+						maskType: 'INTERNATIONAL',
+						withDDD: false
+					}
+					break
+				case 'credit-card':
+					maskOptions = {
+						obfuscated: false,
+						issuer: 'visa-or-mastercard'
+					}
+					break
+				case 'money':
+					maskOptions = {
+						unit: '$',
+						separator: '.',
+						delimiter: ','
+					}
+					break
+				case 'datetime':
+					maskOptions = {
+						format: 'YYYY/MM/DD'
+					}
+					break
+				default: 
+					break
+			}
+		}
+		if (__DEV__) console.log(`Options: ${JSON.stringify(maskOptions, undefined, 2)}`)
+		return maskOptions
+	}
+
 	renderMaskedTextInput = () => {
 		const { placeholder } = this.props;
 		return (
@@ -122,22 +205,18 @@ export default class TextField extends Component {
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
-					type={'money'}
-					options={{
-						unit: '$',
-						separator: '.',
-						delimiter: ',',
-					}}
+					type={this.getMaskType()}
+					options={this.getMaskOptions()}
 					style={this.stylishTextInput()}
 					value={this.state.text}
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
-					keyboardType={'numeric'}
 					editable={true}
 					onChangeText={this.onMaskedTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
+					maxLength={this.props.customMask ? this.props.customMask.split('').length : undefined}
 				/>
 			</View>
 		);
@@ -211,7 +290,7 @@ export default class TextField extends Component {
 		return (
 			<View>
 				<View style={[styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]}>
-					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+					{ textType == 'default' ? this.renderTextInput() : this.renderMaskedTextInput()}
 					{ this.props.isSecured && this.renderVisibilityIcon() }
 				</View>
 			</View>
