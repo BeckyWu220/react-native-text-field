@@ -37,7 +37,10 @@ export default class TextField extends Component {
 		invalidHintStyle: PropTypes.object,
 		visibilityIconTintColor: PropTypes.color,
 		invisibilityIconSource: PropTypes.object,
-		visibilityIconSource: PropTypes.object
+		visibilityIconSource: PropTypes.object,
+		onSubmitEditing	 : PropTypes.func,
+		onEndEditing	 : PropTypes.func,
+		keyboardType	 : PropTypes.string,
 	};
 
 	static defaultProps = {
@@ -59,7 +62,9 @@ export default class TextField extends Component {
 		invalidHint : 'Your input is not valid.',
 		textFieldStyle : styles.textField,
 		invalidTextFieldStyle : styles.invalidTextField,
-		visibilityIconTintColor: null
+		visibilityIconTintColor: null,
+		onSubmitEditing	 : () => {},
+		onEndEditing	 : () => {},
 	};
 
 	state = {
@@ -217,6 +222,12 @@ export default class TextField extends Component {
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
 					maxLength={this.props.customMask ? this.props.customMask.split('').length : undefined}
+					onSubmitEditing={this.props.onSubmitEditing}
+					onEndEditing={(event) => {
+						this.validate(event.nativeEvent.text)
+						this.props.onEndEditing()
+					}}
+					keyboardType={this.props.keyboardType || 'default'}
 				/>
 			</View>
 		);
@@ -249,7 +260,12 @@ export default class TextField extends Component {
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
 					secureTextEntry={!this.state.isVisible}
-					onEndEditing={(event) => this.validate(event.nativeEvent.text)}
+					onEndEditing={(event) => {
+						this.validate(event.nativeEvent.text)
+						this.props.onEndEditing()
+					}}
+					onSubmitEditing={this.props.onSubmitEditing}
+					keyboardType={this.props.keyboardType || 'default'}
 				/>
 			</View>
 		);
