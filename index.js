@@ -41,9 +41,9 @@ export default class TextField extends Component {
 		onSubmitEditing	 : PropTypes.func,
 		onEndEditing	 : PropTypes.func,
 		keyboardType	 : PropTypes.string,
-		isEditable		 : PropTypes.bool,
-		uneditableTextFieldStyle : PropTypes.object,
-		uneditableTextInputStyle : PropTypes.object,
+		isDisabled		 : PropTypes.bool,
+		disabledTextFieldStyle : PropTypes.object,
+		disabledTextInputStyle : PropTypes.object,
 	};
 
 	static defaultProps = {
@@ -68,9 +68,9 @@ export default class TextField extends Component {
 		visibilityIconTintColor: null,
 		onSubmitEditing	 : () => {},
 		onEndEditing	 : () => {},
-		isEditable	: true,
-		uneditableTextFieldStyle: styles.uneditableTextField,
-		uneditableTextInputStyle: styles.uneditableTextInput,
+		isDisabled	: false,
+		disabledTextFieldStyle: styles.disabledTextField,
+		disabledTextInputStyle: styles.disabledTextInput,
 	};
 
 	state = {
@@ -223,7 +223,7 @@ export default class TextField extends Component {
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
-					editable={this.props.isEditable}
+					editable={!this.props.isDisabled}
 					onChangeText={this.onMaskedTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
@@ -240,9 +240,9 @@ export default class TextField extends Component {
 	}
 
 	stylishTextInput = () => {
-		const { cellHeight, textInputStyle, invalidTextInputStyle, uneditableTextInputStyle } = this.props;
-		if (!this.props.isEditable) {
-			return [styles.textInput, textInputStyle, uneditableTextInputStyle, { height: cellHeight }];
+		const { cellHeight, textInputStyle, invalidTextInputStyle, disabledTextInputStyle } = this.props;
+		if (this.props.isDisabled) {
+			return [styles.textInput, textInputStyle, disabledTextInputStyle, { height: cellHeight }];
 		}
 		if (this.state.isValid) {
 			return [styles.textInput, textInputStyle , { height: cellHeight }];
@@ -263,7 +263,7 @@ export default class TextField extends Component {
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
-					editable={this.props.isEditable}
+					editable={!this.props.isDisabled}
 					multiline={this.props.isMultiline}
 					onChangeText={this.onTextChange}
 					blurOnSubmit={true}
@@ -311,9 +311,9 @@ export default class TextField extends Component {
 	}
 
 	stylishTextField = () => {
-		const { textFieldStyle, invalidTextFieldStyle, uneditableTextFieldStyle } = this.props
-		if (!this.props.isEditable) {
-			return [styles.defaultPadding, uneditableTextFieldStyle, styles.flexRowEnd]
+		const { textFieldStyle, invalidTextFieldStyle, disabledTextFieldStyle } = this.props
+		if (this.props.isDisabled) {
+			return [styles.defaultPadding, disabledTextFieldStyle, styles.flexRowEnd]
 		}
 		return [styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]
 	}
