@@ -44,6 +44,7 @@ export default class TextField extends Component {
 		isDisabled		 : PropTypes.bool,
 		disabledTextFieldStyle : PropTypes.object,
 		disabledTextInputStyle : PropTypes.object,
+		onFocus			 : PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -71,6 +72,7 @@ export default class TextField extends Component {
 		isDisabled	: false,
 		disabledTextFieldStyle: styles.disabledTextField,
 		disabledTextInputStyle: styles.disabledTextInput,
+		onFocus		: () => {}
 	};
 
 	state = {
@@ -89,11 +91,11 @@ export default class TextField extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		// if (nextProps.value !== this.props.value) {
-		// 	this.setState({
-		// 		text: nextProps.value
-		// 	});
-		// }
+		if (nextProps.value !== this.props.value) {
+			this.setState({
+				text: nextProps.value
+			});
+		}
 		if (nextProps.invalidHint !== this.props.invalidHint) {
 			this.setState({
 				invalidMessage: nextProps.invalidHint
@@ -234,6 +236,7 @@ export default class TextField extends Component {
 						this.props.onEndEditing()
 					}}
 					keyboardType={this.props.keyboardType || 'default'}
+					onFocus={this.props.onFocus}
 				/>
 			</View>
 		);
@@ -275,6 +278,7 @@ export default class TextField extends Component {
 					}}
 					onSubmitEditing={this.props.onSubmitEditing}
 					keyboardType={this.props.keyboardType || 'default'}
+					onFocus={this.props.onFocus}
 				/>
 			</View>
 		);
