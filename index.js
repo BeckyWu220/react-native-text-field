@@ -349,7 +349,7 @@ export default class TextField extends Component {
 		if (this.props.isRequired) {
 			if (!text) {
 				this.setAsInvalid(this.props.isRequiredHint)
-				return 
+				return false
 			} else {
 				this.setState({
 					isValid: true
@@ -368,15 +368,16 @@ export default class TextField extends Component {
 					this.setState({
 						isValid: false
 					})
+					return false
 				}
 				if (validateResult !== false && typeof(validateResult) === 'string') {
 					this.setAsInvalid(validateResult)
+					return false
 				}
 			}
-			// this.setState({
-			// 	isValid: this.props.onValidate(text)
-			// })
 		}
+
+		return true
 	}
 
 	setAsValid() {
@@ -395,6 +396,10 @@ export default class TextField extends Component {
 
 	getIsValid() {
         return this.state.isValid
-    }
+	}
+	
+	getValue() {
+		return this.state.text
+	}
 }
 
