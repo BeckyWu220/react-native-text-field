@@ -41,6 +41,10 @@ export default class TextField extends Component {
 		onSubmitEditing	 : PropTypes.func,
 		onEndEditing	 : PropTypes.func,
 		keyboardType	 : PropTypes.string,
+		isDisabled		 : PropTypes.bool,
+		disabledTextFieldStyle : PropTypes.object,
+		disabledTextInputStyle : PropTypes.object,
+		onFocus			 : PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -65,6 +69,10 @@ export default class TextField extends Component {
 		visibilityIconTintColor: null,
 		onSubmitEditing	 : () => {},
 		onEndEditing	 : () => {},
+		isDisabled	: false,
+		disabledTextFieldStyle: styles.disabledTextField,
+		disabledTextInputStyle: styles.disabledTextInput,
+		onFocus		: () => {}
 	};
 
 	state = {
@@ -83,11 +91,11 @@ export default class TextField extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		// if (nextProps.value !== this.props.value) {
-		// 	this.setState({
-		// 		text: nextProps.value
-		// 	});
-		// }
+		if (nextProps.value !== this.props.value) {
+			this.setState({
+				text: nextProps.value
+			});
+		}
 		if (nextProps.invalidHint !== this.props.invalidHint) {
 			this.setState({
 				invalidMessage: nextProps.invalidHint
@@ -217,7 +225,7 @@ export default class TextField extends Component {
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
-					editable={true}
+					editable={!this.props.isDisabled}
 					onChangeText={this.onMaskedTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
@@ -228,13 +236,17 @@ export default class TextField extends Component {
 						this.props.onEndEditing()
 					}}
 					keyboardType={this.props.keyboardType || 'default'}
+					onFocus={this.props.onFocus}
 				/>
 			</View>
 		);
 	}
 
 	stylishTextInput = () => {
-		const { cellHeight, textInputStyle, invalidTextInputStyle } = this.props;
+		const { cellHeight, textInputStyle, invalidTextInputStyle, disabledTextInputStyle } = this.props;
+		if (this.props.isDisabled) {
+			return [styles.textInput, textInputStyle, disabledTextInputStyle, { height: cellHeight }];
+		}
 		if (this.state.isValid) {
 			return [styles.textInput, textInputStyle , { height: cellHeight }];
 		}
@@ -254,7 +266,7 @@ export default class TextField extends Component {
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
-					editable={true}
+					editable={!this.props.isDisabled}
 					multiline={this.props.isMultiline}
 					onChangeText={this.onTextChange}
 					blurOnSubmit={true}
@@ -266,6 +278,7 @@ export default class TextField extends Component {
 					}}
 					onSubmitEditing={this.props.onSubmitEditing}
 					keyboardType={this.props.keyboardType || 'default'}
+					onFocus={this.props.onFocus}
 				/>
 			</View>
 		);
@@ -301,11 +314,19 @@ export default class TextField extends Component {
 		)
 	}
 
+	stylishTextField = () => {
+		const { textFieldStyle, invalidTextFieldStyle, disabledTextFieldStyle } = this.props
+		if (this.props.isDisabled) {
+			return [styles.defaultPadding, disabledTextFieldStyle, styles.flexRowEnd]
+		}
+		return [styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]
+	}
+
 	renderTextField = () => {
-		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
+		const { textType } = this.props
 		return (
 			<View>
-				<View style={[styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]}>
+				<View style={this.stylishTextField()}>
 					{ textType == 'default' ? this.renderTextInput() : this.renderMaskedTextInput()}
 					{ this.props.isSecured && this.renderVisibilityIcon() }
 				</View>
@@ -328,7 +349,7 @@ export default class TextField extends Component {
 		if (this.props.isRequired) {
 			if (!text) {
 				this.setAsInvalid(this.props.isRequiredHint)
-				return 
+				return false
 			} else {
 				this.setState({
 					isValid: true
@@ -347,15 +368,16 @@ export default class TextField extends Component {
 					this.setState({
 						isValid: false
 					})
+					return false
 				}
 				if (validateResult !== false && typeof(validateResult) === 'string') {
 					this.setAsInvalid(validateResult)
+					return false
 				}
 			}
-			// this.setState({
-			// 	isValid: this.props.onValidate(text)
-			// })
 		}
+
+		return true
 	}
 
 	setAsValid() {
@@ -374,6 +396,10 @@ export default class TextField extends Component {
 
 	getIsValid() {
         return this.state.isValid
-    }
+	}
+	
+	getValue() {
+		return this.state.text
+	}
 }
 
