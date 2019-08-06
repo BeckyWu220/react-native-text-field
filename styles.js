@@ -49,4 +49,13 @@ export default styles = StyleSheet.create({
         borderRadius: 4, 
         borderColor: '#ff0000'
     },
+    disabledTextField: {
+        borderWidth: 1, 
+        borderRadius: 4, 
+        borderColor: '#b2b4b8',
+        backgroundColor: '#e1e2e6'
+    },
+    disabledTextInput: {
+        color: '#b2b4b8'
+    },
 });

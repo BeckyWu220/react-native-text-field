@@ -19,12 +19,15 @@ export default class TextField extends Component {
 		autoCapitalize	: PropTypes.string, //enum('none', 'sentences', 'words', 'characters')
 		autoCorrect		: PropTypes.bool,
 		textType 		: PropTypes.string,
+		customMask		: PropTypes.string,
+		maskOptions		: PropTypes.object,
 		titleStyle		: PropTypes.object,
 		textFieldStyle	: PropTypes.object,
 		textInputStyle	: PropTypes.object,
 		placeholderStyle: PropTypes.object,
 		selectionColor	: PropTypes.color,
 		isRequired		: PropTypes.bool,
+		isRequiredHint	: PropTypes.string,
 		isSecured		: PropTypes.bool,
 		onValidate		: PropTypes.func,
 		validateAsTyping: PropTypes.bool,
@@ -34,7 +37,14 @@ export default class TextField extends Component {
 		invalidHintStyle: PropTypes.object,
 		visibilityIconTintColor: PropTypes.color,
 		invisibilityIconSource: PropTypes.object,
-		visibilityIconSource: PropTypes.object
+		visibilityIconSource: PropTypes.object,
+		onSubmitEditing	 : PropTypes.func,
+		onEndEditing	 : PropTypes.func,
+		keyboardType	 : PropTypes.string,
+		isDisabled		 : PropTypes.bool,
+		disabledTextFieldStyle : PropTypes.object,
+		disabledTextInputStyle : PropTypes.object,
+		onFocus			 : PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -46,14 +56,23 @@ export default class TextField extends Component {
 		autoCapitalize: 'none',
 		autoCorrect	: false,
 		textType 	: 'default',
+		customMask	: '',
+		maskOptions : null,
 		isRequired	: false,
+		isRequiredHint : 'Field is required.',
 		isSecured	: false,
 		onValidate	: null,
 		validateAsTyping: false,
 		invalidHint : 'Your input is not valid.',
 		textFieldStyle : styles.textField,
 		invalidTextFieldStyle : styles.invalidTextField,
-		visibilityIconTintColor: null
+		visibilityIconTintColor: null,
+		onSubmitEditing	 : () => {},
+		onEndEditing	 : () => {},
+		isDisabled	: false,
+		disabledTextFieldStyle: styles.disabledTextField,
+		disabledTextInputStyle: styles.disabledTextInput,
+		onFocus		: () => {}
 	};
 
 	state = {
@@ -85,11 +104,18 @@ export default class TextField extends Component {
 	}
 
 	onMaskedTextChange = (text) => {
-		const rawText = this.maskedTextInput.getRawValue();
 		this.setState({
 			text
+		}, () => {
+			var rawText = this.maskedTextInput.getRawValue();
+			if (this.props.textType == 'credit-card') {
+				rawText = rawText.join('')
+			}
+			if (this.props.validateAsTyping) {
+				this.validate(rawText);
+			}
+			this.props.onInputChange(rawText);
 		});
-		this.props.onInputChange(rawText);
 	}
 
 	onTextChange = (text) => {
@@ -113,6 +139,78 @@ export default class TextField extends Component {
 		}
 	}
 
+	getMaskType = () => {
+		return this.props.textType
+	}
+
+	getMaskOptions = () => {
+		if (this.props.textType == 'custom') {
+			return {
+				/**
+				 * mask: (String | required | default '')
+				 * the mask pattern
+				 * 9 - accept digit.
+				 * A - accept alpha.
+				 * S - accept alphanumeric.
+				 * * - accept all, EXCEPT white space.
+				*/
+				mask: this.props.customMask || '',
+				getRawValue: (value, settings) => {
+					if (this.props.customMask) {
+						let maskCharacters = this.props.customMask.split('')
+						var indiceToKeep = []
+						maskCharacters.map((char, index) => {
+							if (char == '9' || char == 'A' || char == 'S' || char == '*') {
+								indiceToKeep.push(index)
+							}
+						})
+						let valueCharacters = value.split('')
+						let rawValue = valueCharacters.filter((char, index) => {
+							return indiceToKeep.includes(index)
+						}).join('')
+						if (__DEV__) console.log('Value', value, 'RawValue', rawValue)
+						return rawValue
+					}
+				}
+			}
+		}
+		var maskOptions = {}
+		if (this.props.maskOptions) {
+			maskOptions = this.props.maskOptions
+		} else {
+			switch(this.props.textType) {
+				case 'cel-phone':
+					maskOptions = {
+						maskType: 'INTERNATIONAL',
+						withDDD: false
+					}
+					break
+				case 'credit-card':
+					maskOptions = {
+						obfuscated: false,
+						issuer: 'visa-or-mastercard'
+					}
+					break
+				case 'money':
+					maskOptions = {
+						unit: '$',
+						separator: '.',
+						delimiter: ','
+					}
+					break
+				case 'datetime':
+					maskOptions = {
+						format: 'YYYY/MM/DD'
+					}
+					break
+				default: 
+					break
+			}
+		}
+		if (__DEV__) console.log(`Options: ${JSON.stringify(maskOptions, undefined, 2)}`)
+		return maskOptions
+	}
+
 	renderMaskedTextInput = () => {
 		const { placeholder } = this.props;
 		return (
@@ -120,29 +218,35 @@ export default class TextField extends Component {
 				<TextInputMask
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
-					type={'money'}
-					options={{
-						unit: '$',
-						separator: '.',
-						delimiter: ',',
-					}}
+					type={this.getMaskType()}
+					options={this.getMaskOptions()}
 					style={this.stylishTextInput()}
 					value={this.state.text}
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle.color}
 					selectionColor={this.props.selectionColor}
-					keyboardType={'numeric'}
-					editable={true}
+					editable={!this.props.isDisabled}
 					onChangeText={this.onMaskedTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
+					maxLength={this.props.customMask ? this.props.customMask.split('').length : undefined}
+					onSubmitEditing={this.props.onSubmitEditing}
+					onEndEditing={(event) => {
+						this.validate(event.nativeEvent.text)
+						this.props.onEndEditing()
+					}}
+					keyboardType={this.props.keyboardType || 'default'}
+					onFocus={this.props.onFocus}
 				/>
 			</View>
 		);
 	}
 
 	stylishTextInput = () => {
-		const { cellHeight, textInputStyle, invalidTextInputStyle } = this.props;
+		const { cellHeight, textInputStyle, invalidTextInputStyle, disabledTextInputStyle } = this.props;
+		if (this.props.isDisabled) {
+			return [styles.textInput, textInputStyle, disabledTextInputStyle, { height: cellHeight }];
+		}
 		if (this.state.isValid) {
 			return [styles.textInput, textInputStyle , { height: cellHeight }];
 		}
@@ -162,13 +266,19 @@ export default class TextField extends Component {
 					placeholder={placeholder}
 					placeholderTextColor={this.props.placeholderStyle && this.props.placeholderStyle.color ? this.props.placeholderStyle.color : undefined}
 					selectionColor={this.props.selectionColor}
-					editable={true}
+					editable={!this.props.isDisabled}
 					multiline={this.props.isMultiline}
 					onChangeText={this.onTextChange}
 					blurOnSubmit={true}
 					underlineColorAndroid='transparent'
 					secureTextEntry={!this.state.isVisible}
-					onEndEditing={(event) => this.validate(event.nativeEvent.text)}
+					onEndEditing={(event) => {
+						this.validate(event.nativeEvent.text)
+						this.props.onEndEditing()
+					}}
+					onSubmitEditing={this.props.onSubmitEditing}
+					keyboardType={this.props.keyboardType || 'default'}
+					onFocus={this.props.onFocus}
 				/>
 			</View>
 		);
@@ -204,12 +314,20 @@ export default class TextField extends Component {
 		)
 	}
 
+	stylishTextField = () => {
+		const { textFieldStyle, invalidTextFieldStyle, disabledTextFieldStyle } = this.props
+		if (this.props.isDisabled) {
+			return [styles.defaultPadding, disabledTextFieldStyle, styles.flexRowEnd]
+		}
+		return [styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]
+	}
+
 	renderTextField = () => {
-		const { textFieldStyle, textType, invalidTextFieldStyle } = this.props
+		const { textType } = this.props
 		return (
 			<View>
-				<View style={[styles.defaultPadding, this.state.isValid ? textFieldStyle : invalidTextFieldStyle, styles.flexRowEnd]}>
-					{ textType === 'price' ? this.renderMaskedTextInput() : this.renderTextInput() }
+				<View style={this.stylishTextField()}>
+					{ textType == 'default' ? this.renderTextInput() : this.renderMaskedTextInput()}
 					{ this.props.isSecured && this.renderVisibilityIcon() }
 				</View>
 			</View>
@@ -228,6 +346,17 @@ export default class TextField extends Component {
 	}
 
 	validate(text) {
+		if (this.props.isRequired) {
+			if (!text) {
+				this.setAsInvalid(this.props.isRequiredHint)
+				return false
+			} else {
+				this.setState({
+					isValid: true
+				})
+			}
+		}
+
 		if (this.props.onValidate) {
 			const validateResult = this.props.onValidate(text)
 			if (validateResult === true) {
@@ -239,15 +368,16 @@ export default class TextField extends Component {
 					this.setState({
 						isValid: false
 					})
+					return false
 				}
 				if (validateResult !== false && typeof(validateResult) === 'string') {
 					this.setAsInvalid(validateResult)
+					return false
 				}
 			}
-			// this.setState({
-			// 	isValid: this.props.onValidate(text)
-			// })
 		}
+
+		return true
 	}
 
 	setAsValid() {
@@ -266,6 +396,10 @@ export default class TextField extends Component {
 
 	getIsValid() {
         return this.state.isValid
-    }
+	}
+	
+	getValue() {
+		return this.state.text
+	}
 }
 
