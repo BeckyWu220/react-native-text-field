@@ -7,7 +7,7 @@
     "react-native": "0.52.0"
   },
   "name": "react-native-text-field",
-  "version": "4.0.2",
+  "version": "0.0.0-development",
   "description": "A text-field component that wraps text input with customizable title and placeholder. ",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,9 @@
     "textinput",
     "input",
     "text",
-    "field"
+    "field",
+    "validation",
+    "mask"
   ],
   "author": "Becky Wu <wwq220@gmail.com> (http://www.beckywu.me)",
   "license": "ISC",
