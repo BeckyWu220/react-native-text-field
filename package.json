@@ -10,13 +10,13 @@
   "version": "4.0.2",
   "description": "A text-field component that wraps text input with customizable title and placeholder. ",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BeckyWu220/react-native-text-field.git"
+    "url": "https://github.com/BeckyWu220/react-native-text-field.git"
   },
   "keywords": [
     "textfield",
@@ -30,5 +30,28 @@
   "bugs": {
     "url": "https://github.com/BeckyWu220/react-native-text-field/issues"
   },
-  "homepage": "https://github.com/BeckyWu220/react-native-text-field#readme"
+  "homepage": "https://github.com/BeckyWu220/react-native-text-field#readme",
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^8.0.1",
+    "@semantic-release/github": "^7.0.5",
+    "@semantic-release/npm": "^7.0.5",
+    "@semantic-release/release-notes-generator": "^9.0.1",
+    "semantic-release": "^17.0.4"
+  },
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    "@semantic-release/npm",
+    "@semantic-release/github"
+  ]
 }
