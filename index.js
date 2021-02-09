@@ -216,6 +216,7 @@ export default class TextField extends Component {
 		return (
 			<View style={{ flex: 1}}>
 				<TextInputMask
+					{...this.props}
 					allowFontScaling={false}
 					ref={(ref) => { this.maskedTextInput = ref; }}
 					type={this.getMaskType()}
@@ -258,6 +259,7 @@ export default class TextField extends Component {
 		return (
 			<View style={{ flex: 1 }}>
 				<TextInput
+					{...this.props}
 					allowFontScaling={false}
 					autoCapitalize={this.props.autoCapitalize}
 					autoCorrect={this.props.autoCorrect}
